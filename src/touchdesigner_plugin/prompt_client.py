@@ -1,44 +1,41 @@
 import socket
 import cv2
 import numpy as np
+import struct
 
-from touchdesigner_plugin.constants import IMG_WIDTH, IMG_HEIGHT, RGB_CHANNELS
+from touchdesigner_plugin.constants import PORT, HOST
 
 
 def receive_image(server_socket):
-    # Receive image size
-    image_size = int(server_socket.recv(391049).decode())
+    # Receive the 4-byte image size
+    image_size_data = server_socket.recv(4)
 
-    print(f"Received image size: {image_size}")
+    # Unpack the image size as a 4-byte integer
+    image_size = struct.unpack("!I", image_size_data)[0]
+
     # Receive image data
-    image_data = server_socket.recv(image_size)
+    image_data = b""
+    while len(image_data) < image_size:
+        chunk = server_socket.recv(min(image_size - len(image_data), 4096))
+        if not chunk:
+            break
+        image_data += chunk
 
-    print(f"len of received image_data: {len(image_data)}")
-
-    # Convert bytes to numpy array
-    image_array = np.frombuffer(image_data, dtype=np.uint16)
-    print(f"{image_array.shape=}")
-
-    # Decode image
-    image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
-    # image = image_array.reshape((IMG_HEIGHT, IMG_WIDTH, RGB_CHANNELS))
-
+    # Decode the image data using cv2.imdecode
+    image = cv2.imdecode(np.frombuffer(image_data, dtype=np.uint8), cv2.IMREAD_COLOR)
 
     # Save the received image
     cv2.imwrite("received_image.jpg", image)
 
 
 def main():
-    # Client configuration
-    host = '127.0.0.1'
-    port = 12345
 
     # Prompt to send to the server
     prompt = "Send me an image!"
 
     # Create socket
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((host, port))
+    client_socket.connect((HOST, PORT))
 
     try:
         # Send prompt to server

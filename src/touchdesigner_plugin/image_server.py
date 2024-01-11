@@ -1,39 +1,31 @@
 import socket
-import cv2
-import numpy as np
+import cv2 as cv
+import struct
 
-encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
+from touchdesigner_plugin.constants import HOST, PORT, JPEG_ENCODE_QUALITY_PERCENT
 
 
 def send_image(client_socket, image_path):
-    # Read image
-    image = cv2.imread(image_path)
+    # ToDo generate image here
+    image = cv.imread(image_path)
 
-    print(f"Sending {image_path} of original size {image.shape} which is {image.shape[0] * image.shape[1] * image.shape[2]}")
+    # NOTE: decrease JPEG_ENCODE_QUALITY_PERCENT to increase performance
+    _, image_data = cv.imencode(
+        '.jpg', image, [int(cv.IMWRITE_JPEG_QUALITY), JPEG_ENCODE_QUALITY_PERCENT]
+    )
 
-    # Convert image to bytes
-    _, image_data = cv2.imencode('.jpg', image)
-    print(f"after encoding {image_data.shape=}")
-    image_bytes = image_data.tobytes()
-
-    # Send image size to client
-    client_socket.send(str(len(image_bytes)).encode())
-
-    # Send image data to client
-    client_socket.send(image_bytes)
+    image_size = struct.pack("!I", len(image_data))
+    client_socket.send(image_size)
+    client_socket.send(image_data.tobytes())
 
 
 def main():
-    # Server configuration
-    host = '127.0.0.1'
-    port = 12345
-
     # Create socket
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind((host, port))
+    server_socket.bind((HOST, PORT))
     server_socket.listen(3)
 
-    print(f"Server listening on {host}:{port}")
+    print(f"Server listening on {HOST}:{PORT}")
 
     while True:
         client_socket, client_address = server_socket.accept()
