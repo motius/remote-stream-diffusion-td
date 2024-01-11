@@ -1,0 +1,29 @@
+[project]
+name = "touchdesigner-plugin"
+version = "0.1.0"
+description = "Add your description here"
+dependencies = [
+    "opencv-python>=4.9.0.80",
+    "paho-mqtt>=1.6.1",
+]
+readme = "README.md"
+requires-python = ">= 3.8"
+
+# [project.scripts]
+# hello = "touchdesigner-plugin:hello"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = [
+    "pytest>=7.4.4",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/touchdesigner_plugin"]
