@@ -1,1 +1,6 @@
-**__pycache__
+**/__pycache__
+**/received_image*
+**/imgs
+
+# IDE
+**/.idea
