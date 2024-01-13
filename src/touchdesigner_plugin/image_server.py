@@ -25,7 +25,7 @@ class ImageServer:
     def send_image(self, client_socket):
         # ToDo generate image here
         if not self.use_webcam:
-            image = get_random_image(nb_circles=3)
+            image = get_random_image(nb_circles=3, noise_background=False)
         else:
             image = self.capture.read()[1]
 
