@@ -1,34 +1,37 @@
+import glob
 import socket
-import cv2 as cv
 import struct
 
-from touchdesigner_plugin.constants import HOST, PORT, JPEG_ENCODE_QUALITY_PERCENT
+import cv2 as cv
+
+from touchdesigner_plugin.constants import HOST, JPEG_ENCODE_QUALITY_PERCENT, PORT
+from touchdesigner_plugin.utils import get_random_image
 
 
 class ImageServer:
-    def __init__(self, use_webcam: int = 0):
+    def __init__(self, use_webcam: bool = False):
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.bind((HOST, PORT))
-        self.server_socket.listen(3)
+        self.server_socket.listen(5)
 
         self.use_webcam = use_webcam
         if self.use_webcam:
-            self.cap = cv.VideoCapture(use_webcam)
+            self.capture = cv.VideoCapture(0)
         else:
-            self.image_path = "imgs/IMG_7418_1280x720.jpg"
+            self.images = glob.glob("./imgs/*")
 
         print(f"Server listening on {HOST}:{PORT}")
 
     def send_image(self, client_socket):
         # ToDo generate image here
         if not self.use_webcam:
-            image = cv.imread(self.image_path)
+            image = get_random_image(nb_circles=3)
         else:
-            ret, image = capture.read()
+            image = self.capture.read()[1]
 
         # NOTE: decrease JPEG_ENCODE_QUALITY_PERCENT to increase performance
         _, image_data = cv.imencode(
-            '.jpg', image, [int(cv.IMWRITE_JPEG_QUALITY), JPEG_ENCODE_QUALITY_PERCENT]
+            ".jpg", image, [int(cv.IMWRITE_JPEG_QUALITY), JPEG_ENCODE_QUALITY_PERCENT]
         )
 
         image_size = struct.pack("!I", len(image_data))

@@ -1,15 +1,17 @@
 import socket
-import cv2
-import numpy as np
 import struct
 
-from touchdesigner_plugin.constants import PORT, HOST
+import cv2
+import numpy as np
+
+from touchdesigner_plugin.constants import HOST, PORT
 
 
 class PromptClient:
     def __init__(self):
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client_socket.connect((HOST, PORT))
+        self.image = None
 
     def run(self, prompt: str):
         try:
@@ -19,7 +21,7 @@ class PromptClient:
             # Receive image from server
             self.receive_image()
 
-            print("Image received successfully")
+            # print("Image received successfully")
         except Exception as e:
             print(f"Exception: {e}")
 
@@ -38,10 +40,12 @@ class PromptClient:
             image_data += chunk
 
         # Decode the image data using cv2.imdecode
-        image = cv2.imdecode(np.frombuffer(image_data, dtype=np.uint8), cv2.IMREAD_COLOR)
+        self.image = cv2.imdecode(
+            np.frombuffer(image_data, dtype=np.uint8), cv2.IMREAD_COLOR
+        )
 
         # Save the received image
-        cv2.imwrite("received_image.jpg", image)
+        cv2.imwrite("received_image.jpg", self.image)
 
     def __del__(self) -> None:
         self.client_socket.close()

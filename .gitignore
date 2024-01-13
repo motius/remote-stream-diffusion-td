@@ -1,6 +1,16 @@
+# Dev files
 **/__pycache__
 **/received_image*
 **/imgs
 
+# Builds
+dist
+
 # IDE
 **/.idea
+
+# OS specific
+**/.DS_Store
+
+# Touchdesigner
+td_workflow/Backup

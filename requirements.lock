@@ -9,4 +9,3 @@
 -e file:.
 numpy==1.26.3
 opencv-python==4.9.0.80
-paho-mqtt==1.6.1
