@@ -10,7 +10,13 @@ from touchdesigner_plugin.constants import HOST, PORT
 class PromptClient:
     def __init__(self):
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client_socket.connect((HOST, PORT))
+        try:
+            self.client_socket.connect((HOST, PORT))
+        except ConnectionRefusedError as e:
+            print(
+                f"{e}, are you using the correct ip to the running image server? "
+                f"Also, did you check if your image server is running?"
+            )
         self.image = None
 
     def run(self, prompt: str):
