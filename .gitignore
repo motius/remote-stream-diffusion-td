@@ -13,5 +13,6 @@ dist
 **/.DS_Store
 
 # Touchdesigner
+td_workflow/CrashAutoSave*
 td_workflow/Backup
 td_workflow/td_workflow.*.toe

@@ -42,6 +42,28 @@ pip install -r requirements.txt
 
 ## Image Server
 
+### How to run
+
+The image server acts as a file server, so you have to clone this repo on the remote machine and start it, if it's running you will need to forward the port to your local machine.
+
+On the remote machine:
+
+```bash
+ssh <user>@<remote-ip>
+cd to/where/you/want/to/clone/this/to
+git clone ...
+rye sync
+rye run python src/touchdesigner_plugin/image_server.py
+```
+
+On you local machine:
+
+Open a new terminal and forward the port, currently it's set to 5002 you can change that in the `src/touchdesigner_plugin/constants.py`
+
+```bash
+ssh -L 5002:localhost:5002 <user>@<remote-ip>
+```
+
 ### ComfyUI
 
 If you want to use stable diffusion you can forward comfyUI from the remote server to your local machine using

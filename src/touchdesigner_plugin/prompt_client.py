@@ -51,7 +51,7 @@ class PromptClient:
         )
 
         # Save the received image
-        cv2.imwrite("received_image.jpg", self.image)
+        # cv2.imwrite("received_image.jpg", self.image)
 
     def __del__(self) -> None:
         self.client_socket.close()
