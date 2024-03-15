@@ -28,6 +28,61 @@ rye sync
 rye run python ...
 ```
 
+
+## Image Server
+
+### Random Image generator
+
+The random image generator is a simple image server that generates images using opencv you can run it using rye since it doesn't have any additional dependencies
+
+```bash
+cd path/to/StreamDiffusion
+export PYTHONPATH=${PWD}
+cd path/to/touchdesigner-plugin
+cd src
+export PYTHONPATH=$PYTHONPATH:${PWD}
+
+
+# for reference `echo $PYTHONPATH` should return sth like this
+# /home/<user>/workspace/StreamDiffusion:/home/<user>/workspace/touchdesigner-plugin/src
+# now run it
+cd path/to/touchdesigner_plugin
+rye run python src/touchdesigner_plugin/image_server.py
+```
+
+That's it you can now generate colorful images in your techdesigner session.
+
+
+### Stream Diffusion
+
+#### Installation
+
+To install stream diffusion please follow the instructions on their [Github repository](https://github.com/cumulo-autumn/StreamDiffusion). You have to install it independently from the rye packaged project here and run it in a separate virtual environment. I can't say more because it highly depends on your GPU setup.
+
+#### Run Stream diffusion on server
+
+The stream diffusion is integrated in the [stream_diffusion_server.py](./src/touchdesigner_plugin/stream_diffusion_server.py), please activate your virtual environment and run it and then just start your touchdesigner session and start generating.
+
+```bash
+# activate virtual env e.g.
+source .venv/bin/activate
+python src/touchdesigner/stream_diffusion_server.py
+```
+
+That's it you should now be able to use the generate images in touchdesigner.
+
+
+### Port Forwarding
+
+If you want to forward a port from the remote machine to local e.g. port 8188 remote to 8190 local
+
+```bash
+ssh -L 8190:localhost:8188 <user>@<remote-ip>
+```
+
+Now access it on the local machine under http://localhost:8190
+
+
 ## FAQ
 
 If you have issues using rye you can always generate a good old requirements.txt by doing the following
@@ -39,37 +94,3 @@ python3 -m venv .td
 source .td/bin/activate
 pip install -r requirements.txt
 ```
-
-## Image Server
-
-### How to run
-
-The image server acts as a file server, so you have to clone this repo on the remote machine and start it, if it's running you will need to forward the port to your local machine.
-
-On the remote machine:
-
-```bash
-ssh <user>@<remote-ip>
-cd to/where/you/want/to/clone/this/to
-git clone ...
-rye sync
-rye run python src/touchdesigner_plugin/image_server.py
-```
-
-On you local machine:
-
-Open a new terminal and forward the port, currently it's set to 5002 you can change that in the `src/touchdesigner_plugin/constants.py`
-
-```bash
-ssh -L 5002:localhost:5002 <user>@<remote-ip>
-```
-
-### ComfyUI
-
-If you want to use stable diffusion you can forward comfyUI from the remote server to your local machine using
-
-```bash
-ssh -L 8188:localhost:8188 <user>@<remote-ip>
-```
-
-Now access it on the local machine under http://localhost:8188
