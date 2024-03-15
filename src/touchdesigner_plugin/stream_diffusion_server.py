@@ -1,19 +1,17 @@
-import glob
+import os
 import socket
 import struct
-import os
 import sys
-from typing import Literal, Dict, Optional
+from typing import Literal
 
 import cv2 as cv
 import numpy as np
 
 from touchdesigner_plugin.constants import HOST, JPEG_ENCODE_QUALITY_PERCENT, PORT
-from touchdesigner_plugin.utilities import get_random_image
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from utils.wrapper import StreamDiffusionWrapper
+from utils.wrapper import StreamDiffusionWrapper  # noqa: E402
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -25,7 +23,7 @@ class StreamDiffusionServer:
         self.server_socket.listen(5)
 
         model_id_or_path: str = "KBlueLeaf/kohaku-v2.1"
-        lora_dict: Optional[Dict[str, float]] = None
+        lora_dict: dict[str, float] | None = None
         width: int = 512
         height: int = 512
         acceleration: Literal["none", "xformers", "tensorrt"] = "xformers"
@@ -54,12 +52,11 @@ class StreamDiffusionServer:
         # image = get_random_image(nb_circles=3, noise_background=False)
         image = np.array(self.stream())
 
-
         # NOTE: decrease JPEG_ENCODE_QUALITY_PERCENT to increase performance
         _, image_data = cv.imencode(
             ".jpg", image, [int(cv.IMWRITE_JPEG_QUALITY), JPEG_ENCODE_QUALITY_PERCENT]
         )
-    
+
         image_size = struct.pack("!I", len(image_data))
         client_socket.send(image_size)
         client_socket.send(image_data.tobytes())
@@ -78,7 +75,7 @@ class StreamDiffusionServer:
                     prompt=prompt,
                     num_inference_steps=50,
                 )
-                
+
                 # Send image to client
                 self.send_image(client_socket)
 
