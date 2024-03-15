@@ -1,16 +1,14 @@
-  jobs:
-    pre-commit:
-      runs-on: ubuntu-latest
+name: pre-commit
 
-      steps:
-        - uses: actions/checkout@v2
+on:
+  pull_request:
+  push:
+    branches: [main]
 
-        - name: Set up Python 3.11
-          uses: actions/setup-python@v1
-          with:
-            python-version: 3.11
-
-        - name: pre-commit
-          run: |
-            pip install pre-commit
-            pre-commit run --all-files
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3
+    - uses: pre-commit/action@v3.0.1
